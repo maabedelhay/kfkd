@@ -1,0 +1,2 @@
+interesting how to represent the kata? 
+content maybe as a temp file on the system with another Solution file can be opened
