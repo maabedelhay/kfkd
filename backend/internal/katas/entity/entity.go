@@ -7,12 +7,14 @@ import (
 )
 
 type KataInfo struct {
+	ID         int64     `json:"id"`
 	Title      string    `json:"title"`
 	Content    string    `json:"content"`
 	Note       string    `json:"note"`
-	Difficulty int64     `json:"difficulty"`
+	Difficulty string    `json:"difficulty"`
 	CreatedAt  time.Time `json:"created_at"`
 	Tags       []string  `json:"tags"`
+	Lines      int64     `json:"lines"`
 }
 
 func (kt *KataInfo) UnmarshalJSON(data []byte) error {
@@ -35,6 +37,7 @@ func (kt *KataInfo) UnmarshalJSON(data []byte) error {
 	kt.Note = string(stringNote)
 	kt.Difficulty = kata.Difficulty
 	kt.Tags = kata.Tags
+	kt.Lines = kata.Lines
 
 	return nil
 }

@@ -3,6 +3,7 @@ package repo
 import (
 	"context"
 	"database/sql"
+	"strconv"
 
 	"github.com/maabedelhay/kfkd/backend/internal/katas/entity"
 	"github.com/uptrace/bun"
@@ -58,6 +59,19 @@ func (r *KataRepo) Get(ctx context.Context, title string) (*entity.KataInfo, err
 	k := ModelToKataInfo(kata)
 	return &k, err
 }
+func (r *KataRepo) GetBydId(ctx context.Context, id string) (*entity.KataInfo, error) {
+	kata := &Kata{}
+	intId, err := strconv.Atoi(id)
+	if err != nil {
+		return &entity.KataInfo{}, err
+	}
+	err = r.db.NewSelect().Model(kata).Where("id = ?", intId).Relation("Tags").Scan(ctx)
+	if err != nil {
+		return &entity.KataInfo{}, err
+	}
+	k := ModelToKataInfo(kata)
+	return &k, err
+}
 
 func (kr *KataRepo) List(ctx context.Context) ([]entity.KataInfo, error) {
 	katas := []Kata{}
@@ -79,10 +93,10 @@ func (kr *KataRepo) Save(ctx context.Context, kata *entity.KataInfo) error {
 		if err != nil {
 			return err
 		}
-		
+
 		if len(kata.Tags) > 0 {
 			for i := range kataModel.Tags {
-				kataModel.Tags[i].KataID = kataModel.ID 
+				kataModel.Tags[i].KataID = kataModel.ID
 			}
 			_, err := tx.NewInsert().Model(&kataModel.Tags).Exec(ctx)
 			if err != nil {
@@ -115,6 +129,7 @@ func ModelToKataInfo(kata *Kata) entity.KataInfo {
 		Difficulty: kata.Difficulty,
 		Note:       kata.Note,
 		CreatedAt:  kata.CreatedAt,
+		ID:         kata.ID,
 	}
 	for _, kataTag := range kata.Tags {
 		info.Tags = append(info.Tags, kataTag.Tag)

@@ -1,5 +1,7 @@
 "use client";
 
+export const dynamic = "force-dynamic";
+
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
@@ -24,7 +26,6 @@ export default function NewKataPage() {
 
   const [title, setTitle] = useState("");
   const [content, setContent] = useState("");
-  const [lines, setLines] = useState("");
   const [note, setNote] = useState("");
   const [difficulty, setDifficulty] = useState<Difficulty>("medium");
   const [tagInput, setTagInput] = useState("");
@@ -68,7 +69,7 @@ export default function NewKataPage() {
       await kataApi.save({
         title: title.trim(),
         content: content.trim(),
-        lines: lines ? parseInt(lines, 10) : 0,
+        lines: content.trim() ? content.trim().split("\n").length : 0,
         note: note.trim(),
         difficulty,
         tags,
@@ -118,35 +119,22 @@ export default function NewKataPage() {
           />
         </div>
 
-        {/* Lines + Difficulty row */}
-        <div className="grid grid-cols-2 gap-4">
-          <div className="flex flex-col gap-1.5">
-            <Label htmlFor="lines">Lines</Label>
-            <Input
-              id="lines"
-              type="number"
-              min={0}
-              placeholder="0"
-              value={lines}
-              onChange={(e) => setLines(e.target.value)}
-            />
-          </div>
-          <div className="flex flex-col gap-1.5">
-            <Label htmlFor="difficulty">Difficulty</Label>
-            <Select
-              value={difficulty}
-              onValueChange={(v) => setDifficulty(v as Difficulty)}
-            >
-              <SelectTrigger id="difficulty">
-                <SelectValue />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="easy">Easy</SelectItem>
-                <SelectItem value="medium">Medium</SelectItem>
-                <SelectItem value="hard">Hard</SelectItem>
-              </SelectContent>
-            </Select>
-          </div>
+        {/* Difficulty */}
+        <div className="flex flex-col gap-1.5">
+          <Label htmlFor="difficulty">Difficulty</Label>
+          <Select
+            value={difficulty}
+            onValueChange={(v) => setDifficulty(v as Difficulty)}
+          >
+            <SelectTrigger id="difficulty">
+              <SelectValue />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="easy">Easy</SelectItem>
+              <SelectItem value="medium">Medium</SelectItem>
+              <SelectItem value="hard">Hard</SelectItem>
+            </SelectContent>
+          </Select>
         </div>
 
         {/* Note */}

@@ -13,8 +13,9 @@ type Kata struct {
 	Title      string    `bun:",notnull,unique"`
 	Content    string    `bun:",notnull"`
 	Note       string    `bun:""`
-	Difficulty int64     `bun:""`
+	Difficulty string    `bun:""`
 	CreatedAt  time.Time `bun:",default:current_timestamp"`
+	Lines      int64     `bun:""`
 
 	Tags []KataTag `bun:"rel:has-many,join:id=kata_id"`
 }

@@ -16,19 +16,39 @@ async function request<T>(path: string, options?: RequestInit): Promise<T> {
   return res.json() as Promise<T>;
 }
 
+async function requestVoid(path: string, options?: RequestInit): Promise<void> {
+  const res = await fetch(`${BASE_URL}${path}`, {
+    headers: { "Content-Type": "application/json" },
+    ...options,
+  });
+
+  if (!res.ok) {
+    const text = await res.text().catch(() => "Unknown error");
+    throw new Error(`API error ${res.status}: ${text}`);
+  }
+}
+
+function b64(str: string): string {
+  return btoa(String.fromCharCode(...new TextEncoder().encode(str)));
+}
+
 export const kataApi = {
   list(): Promise<Kata[]> {
-    return request<Kata[]>("/katas");
+    return request<Kata[]>("/kata/list");
   },
 
   get(id: number): Promise<Kata> {
-    return request<Kata>(`/katas/${id}`);
+    return request<Kata>(`/kata/${id}`);
   },
 
-  save(payload: CreateKataPayload): Promise<Kata> {
-    return request<Kata>("/katas", {
+  save(payload: CreateKataPayload): Promise<void> {
+    return requestVoid("/kata", {
       method: "POST",
-      body: JSON.stringify(payload),
+      body: JSON.stringify({
+        ...payload,
+        content: b64(payload.content),
+        note: b64(payload.note),
+      }),
     });
   },
 };

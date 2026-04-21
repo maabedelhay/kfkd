@@ -9,6 +9,7 @@ import (
 
 type KataRepo interface {
 	Get(ctx context.Context, title string) (*entity.KataInfo, error)
+	GetBydId(ctx context.Context, id string) (*entity.KataInfo, error)
 	Save(ctx context.Context, kata *entity.KataInfo) error
 	List(ctx context.Context) ([]entity.KataInfo, error)
 }
@@ -41,6 +42,7 @@ func NewKataService(opts ...Option) *KataService {
 func (ks *KataService) GetKataByTitle(ctx context.Context, title string) (*entity.KataInfo, error) {
 	kata, err := ks.repo.Get(ctx, title)
 	if err != nil {
+		ks.log.Errorf("get kata by title=%s : %v", title, err)
 		return &entity.KataInfo{}, err
 	}
 	return kata, nil
@@ -62,4 +64,13 @@ func (ks *KataService) List(ctx context.Context) ([]entity.KataInfo, error) {
 	}
 
 	return katas, nil
+}
+
+func (ks *KataService) GetKataById(ctx context.Context, id string) (*entity.KataInfo, error) {
+	kata, err := ks.repo.GetBydId(ctx, id)
+	if err != nil {
+		ks.log.Errorf("get kata by Id=%s: %v", id, err)
+		return &entity.KataInfo{}, err
+	}
+	return kata, nil
 }

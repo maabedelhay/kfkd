@@ -13,6 +13,7 @@ import (
 type KataService interface {
 	Save(ctx context.Context, kata *entity.KataInfo) error
 	GetKataByTitle(ctx context.Context, title string) (*entity.KataInfo, error)
+	GetKataById(ctx context.Context, id string) (*entity.KataInfo, error)
 	List(ctx context.Context) ([]entity.KataInfo, error)
 }
 type Controler struct {
@@ -42,18 +43,32 @@ func NewKataControler(opts ...Option) *Controler {
 }
 
 func (ctr *Controler) Get(w http.ResponseWriter, r *http.Request) {
-	title := r.URL.Query().Get("title")
 	ctx := r.Context()
-	if title == "" {
-		ctr.log.Error("get kata not title")
-		http.Error(w, "title query parameter is empty", http.StatusBadRequest)
-		return
+	title := r.URL.Query().Get("title")
+	var err error
+	var kata *entity.KataInfo
+	if title != "" {
+		kata, err = ctr.ks.GetKataByTitle(ctx, title)
+		if err != nil {
+			http.Error(w, err.Error(), http.StatusInternalServerError)
+			return
+		}
+
+	} else {
+		id := r.PathValue("id")
+		if id == "" {
+			ctr.log.Error("get kata no id")
+			http.Error(w, "kata id query parameter is empty", http.StatusBadRequest)
+			return
+		}
+
+		kata, err = ctr.ks.GetKataById(ctx, id)
+		if err != nil {
+			http.Error(w, err.Error(), http.StatusInternalServerError)
+			return
+		}
 	}
-	kata, err := ctr.ks.GetKataByTitle(ctx, title)
-	if err != nil {
-		http.Error(w, err.Error(), http.StatusInternalServerError)
-		return
-	}
+
 	data, err := json.Marshal(kata)
 	if err != nil {
 		ctr.log.Errorf("get kata marshal: %v", err)

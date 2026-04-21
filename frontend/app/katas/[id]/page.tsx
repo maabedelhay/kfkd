@@ -122,8 +122,8 @@ export default function KataDetailPage() {
           {kata.tags?.length > 0 && (
             <div className="flex flex-wrap gap-1.5">
               {kata.tags.map((tag) => (
-                <Badge key={tag.id} variant="outline">
-                  {tag.name}
+                <Badge key={tag} variant="outline">
+                  {tag}
                 </Badge>
               ))}
             </div>

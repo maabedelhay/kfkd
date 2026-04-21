@@ -24,7 +24,7 @@ func main() {
 
 	server := http.Server{
 		Addr:    ":8083",
-		Handler: mw.EntryMiddelwareLog(mux),
+		Handler: mw.CorsMiddleware(mw.EntryMiddelwareLog(mux)),
 	}
 	log.Println("Listening...")
 	server.ListenAndServe()
