@@ -15,6 +15,8 @@ type Kata struct {
 	Note       string    `bun:""`
 	Difficulty int64     `bun:""`
 	CreatedAt  time.Time `bun:",default:current_timestamp"`
+
+	Tags []KataTag `bun:"rel:has-many,join:id=kata_id"`
 }
 
 type KataTag struct {
