@@ -11,6 +11,7 @@ type KataRepo interface {
 	Get(ctx context.Context, title string) (*entity.KataInfo, error)
 	GetBydId(ctx context.Context, id string) (*entity.KataInfo, error)
 	Save(ctx context.Context, kata *entity.KataInfo) error
+	DelteById(ctx context.Context, id string) error
 	List(ctx context.Context) ([]entity.KataInfo, error)
 }
 type KataService struct {
@@ -73,4 +74,12 @@ func (ks *KataService) GetKataById(ctx context.Context, id string) (*entity.Kata
 		return &entity.KataInfo{}, err
 	}
 	return kata, nil
+}
+
+func (ks *KataService) DelteById(ctx context.Context, id string) error {
+	if err := ks.repo.DelteById(ctx, id); err != nil {
+		ks.log.Errorf("delete by id=%s: %v",id,err)
+		return nil
+	}
+	return nil
 }

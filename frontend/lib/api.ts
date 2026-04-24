@@ -51,4 +51,8 @@ export const kataApi = {
       }),
     });
   },
+
+  delete(id: number): Promise<void> {
+    return requestVoid(`/kata/${id}`, { method: "DELETE" });
+  },
 };

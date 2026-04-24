@@ -32,7 +32,7 @@ export function KatasTable({ katas }: KatasTableProps) {
     <div className="rounded-lg border border-zinc-200 overflow-hidden">
       <table className="w-full text-sm">
         <thead>
-          <tr className="bg-zinc-50 border-b border-zinc-200">
+          <tr className="bg-zinc-100 border-b border-zinc-200">
             <th className="text-left px-4 py-3 font-medium text-zinc-500">Title</th>
             <th className="text-left px-4 py-3 font-medium text-zinc-500">Difficulty</th>
             <th className="text-left px-4 py-3 font-medium text-zinc-500">Lines</th>
@@ -46,7 +46,7 @@ export function KatasTable({ katas }: KatasTableProps) {
               key={kata.id}
               onClick={() => router.push(`/katas/${kata.id}`)}
               className={`
-                cursor-pointer transition-colors hover:bg-zinc-50
+                cursor-pointer transition-colors bg-white hover:bg-zinc-50
                 ${i !== katas.length - 1 ? "border-b border-zinc-100" : ""}
               `}
             >

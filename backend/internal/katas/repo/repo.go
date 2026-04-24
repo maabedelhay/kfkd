@@ -84,7 +84,7 @@ func (kr *KataRepo) List(ctx context.Context) ([]entity.KataInfo, error) {
 	}
 	return katasInfo, nil
 }
-
+// mybe would be better as upsert
 func (kr *KataRepo) Save(ctx context.Context, kata *entity.KataInfo) error {
 	return kr.db.RunInTx(ctx, nil, func(ctx context.Context, tx bun.Tx) error {
 
@@ -107,6 +107,13 @@ func (kr *KataRepo) Save(ctx context.Context, kata *entity.KataInfo) error {
 	})
 }
 
+func (kr *KataRepo) DelteById(ctx context.Context, id string) error {
+	_, err := kr.db.NewDelete().Model((*Kata)(nil)).Where("id = ?",id).Exec(ctx)
+	if err != nil {
+		return err
+	}
+	return nil
+}
 func KataInfoToModel(kataInfo *entity.KataInfo) Kata {
 	kata := Kata{
 		Title:      kataInfo.Title,

@@ -35,7 +35,7 @@ export default function RootLayout({
               href="/katas"
               className="text-sm font-semibold tracking-tight text-zinc-900 hover:text-zinc-500 transition-colors"
             >
-              katas
+              <img src="../../kfkd_logo.png" alt="kfkd" width="50" height="50"/>
             </Link>
           </nav>
         </header>

@@ -3,7 +3,7 @@
 import { useEffect, useState, useCallback } from "react";
 import { useParams, useRouter } from "next/navigation";
 import Link from "next/link";
-import { ArrowLeft, Calendar, Hash, StickyNote } from "lucide-react";
+import { ArrowLeft, Calendar, Hash, StickyNote, Trash2 } from "lucide-react";
 import { kataApi } from "@/lib/api";
 import { Kata } from "@/types/kata";
 import { DifficultyBadge } from "@/components/difficulty-badge";
@@ -28,6 +28,19 @@ export default function KataDetailPage() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [code, setCode] = useState("");
+  const [deleting, setDeleting] = useState(false);
+
+  async function handleDelete() {
+    if (!kata) return;
+    setDeleting(true);
+    try {
+      await kataApi.delete(kata.id);
+      router.push("/katas");
+    } catch (e) {
+      setError(e instanceof Error ? e.message : "Failed to delete kata");
+      setDeleting(false);
+    }
+  }
 
   useEffect(() => {
     if (!id) return;
@@ -100,6 +113,16 @@ export default function KataDetailPage() {
           {kata.title}
         </h1>
         <DifficultyBadge difficulty={kata.difficulty} />
+        <Button
+          // variant="destructive"
+          size="sm"
+          className="ml-auto"
+          onClick={handleDelete}
+          disabled={deleting}
+        >
+          <Trash2 className="h-4 w-4" />
+          {deleting ? "Deleting…" : "Delete"}
+        </Button>
       </div>
 
       {/* Split pane */}
