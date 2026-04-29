@@ -50,6 +50,7 @@ func (ks *KataService) GetKataByTitle(ctx context.Context, title string) (*entit
 }
 
 func (ks *KataService) Save(ctx context.Context, kata *entity.KataInfo) error {
+	ks.log.Infof("save kata=%s lines=%d", kata.Title, kata.Lines)
 	if err := ks.repo.Save(ctx, kata); err != nil {
 		ks.log.Error()
 		return err
@@ -78,7 +79,7 @@ func (ks *KataService) GetKataById(ctx context.Context, id string) (*entity.Kata
 
 func (ks *KataService) DelteById(ctx context.Context, id string) error {
 	if err := ks.repo.DelteById(ctx, id); err != nil {
-		ks.log.Errorf("delete by id=%s: %v",id,err)
+		ks.log.Errorf("delete by id=%s: %v", id, err)
 		return nil
 	}
 	return nil

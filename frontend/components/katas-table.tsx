@@ -1,6 +1,6 @@
 "use client";
 
-import { useRouter } from "next/navigation";
+import Link from "next/link";
 import { Kata } from "@/types/kata";
 import { DifficultyBadge } from "@/components/difficulty-badge";
 import { Badge } from "@/components/ui/badge";
@@ -10,16 +10,13 @@ interface KatasTableProps {
 }
 
 function formatDate(iso: string) {
-  return new Date(iso).toLocaleDateString("en-GB", {
-    day: "2-digit",
-    month: "short",
-    year: "numeric",
-  });
+  const d = new Date(iso);
+  return `${String(d.getUTCDate()).padStart(2, "0")} ${
+    ["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"][d.getUTCMonth()]
+  } ${d.getUTCFullYear()}`;
 }
 
 export function KatasTable({ katas }: KatasTableProps) {
-  const router = useRouter();
-
   if (katas.length === 0) {
     return (
       <div className="flex flex-col items-center justify-center py-24 text-zinc-400">
@@ -44,19 +41,29 @@ export function KatasTable({ katas }: KatasTableProps) {
           {katas.map((kata, i) => (
             <tr
               key={kata.id}
-              onClick={() => router.push(`/katas/${kata.id}`)}
-              className={`
-                cursor-pointer transition-colors bg-white hover:bg-zinc-50
-                ${i !== katas.length - 1 ? "border-b border-zinc-100" : ""}
-              `}
+              className={`group relative transition-colors bg-white hover:bg-zinc-50 ${
+                i !== katas.length - 1 ? "border-b border-zinc-100" : ""
+              }`}
             >
-              <td className="px-4 py-3 font-medium text-zinc-900">{kata.title}</td>
-              <td className="px-4 py-3">
+              <td className="px-4 py-3 font-medium text-zinc-900 relative">
+                <Link
+                  href={`/katas/${kata.id}`}
+                  className="absolute inset-0"
+                  aria-label={`Open ${kata.title}`}
+                />
+                {kata.title}
+              </td>
+              <td className="px-4 py-3 relative">
+                <Link href={`/katas/${kata.id}`} className="absolute inset-0" tabIndex={-1} />
                 <DifficultyBadge difficulty={kata.difficulty} />
               </td>
-              <td className="px-4 py-3 text-zinc-500 tabular-nums">{kata.lines}</td>
-              <td className="px-4 py-3">
-                <div className="flex flex-wrap gap-1">
+              <td className="px-4 py-3 text-zinc-500 tabular-nums relative">
+                <Link href={`/katas/${kata.id}`} className="absolute inset-0" tabIndex={-1} />
+                {kata.lines}
+              </td>
+              <td className="px-4 py-3 relative">
+                <Link href={`/katas/${kata.id}`} className="absolute inset-0" tabIndex={-1} />
+                <div className="flex flex-wrap gap-1 pointer-events-none">
                   {kata.tags?.map((tag) => (
                     <Badge key={tag} variant="outline">
                       {tag}
@@ -64,7 +71,8 @@ export function KatasTable({ katas }: KatasTableProps) {
                   ))}
                 </div>
               </td>
-              <td className="px-4 py-3 text-zinc-400 tabular-nums">
+              <td className="px-4 py-3 text-zinc-400 tabular-nums relative">
+                <Link href={`/katas/${kata.id}`} className="absolute inset-0" tabIndex={-1} />
                 {formatDate(kata.created_at)}
               </td>
             </tr>

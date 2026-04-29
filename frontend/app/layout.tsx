@@ -24,10 +24,11 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html
-      lang="en"
-      className={`${geistSans.variable} ${geistMono.variable} h-full antialiased`}
-    >
+<html
+  lang="en"
+  suppressHydrationWarning
+  className={`${geistSans.variable} ${geistMono.variable} h-full antialiased`}
+>
       <body className="min-h-full flex flex-col bg-white text-zinc-900">
         <header className="border-b border-zinc-200 px-6 py-4 shrink-0">
           <nav className="max-w-6xl mx-auto flex items-center gap-2">
@@ -35,7 +36,7 @@ export default function RootLayout({
               href="/katas"
               className="text-sm font-semibold tracking-tight text-zinc-900 hover:text-zinc-500 transition-colors"
             >
-              <img src="../../kfkd_logo.png" alt="kfkd" width="50" height="50"/>
+              <img src="../../kfkd_logo.png" alt="kfkd" width="60" height="60"/>
             </Link>
           </nav>
         </header>

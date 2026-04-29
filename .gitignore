@@ -45,3 +45,6 @@ frontend/.pnpm-debug.log*
 *.tsbuildinfo
 next-env.d.ts
 
+.frontend.log
+sqlitekatas.db
+*.db

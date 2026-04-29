@@ -84,12 +84,13 @@ func (kr *KataRepo) List(ctx context.Context) ([]entity.KataInfo, error) {
 	}
 	return katasInfo, nil
 }
+
 // mybe would be better as upsert
 func (kr *KataRepo) Save(ctx context.Context, kata *entity.KataInfo) error {
 	return kr.db.RunInTx(ctx, nil, func(ctx context.Context, tx bun.Tx) error {
 
 		kataModel := KataInfoToModel(kata)
-		_, err := tx.NewInsert().Model(&kataModel).Exec(ctx)
+		_, err := tx.NewInsert().Model(&kataModel).On("CONFLICT (title) DO UPDATE SET content = EXCLUDED.content, note = EXCLUDED.note, lines = EXCLUDED.lines").Exec(ctx)
 		if err != nil {
 			return err
 		}
@@ -98,7 +99,7 @@ func (kr *KataRepo) Save(ctx context.Context, kata *entity.KataInfo) error {
 			for i := range kataModel.Tags {
 				kataModel.Tags[i].KataID = kataModel.ID
 			}
-			_, err := tx.NewInsert().Model(&kataModel.Tags).Exec(ctx)
+			_, err := tx.NewInsert().Model(&kataModel.Tags).On("CONFLICT (kata_id, tag) DO NOTHING").Exec(ctx)
 			if err != nil {
 				return err
 			}
@@ -108,7 +109,7 @@ func (kr *KataRepo) Save(ctx context.Context, kata *entity.KataInfo) error {
 }
 
 func (kr *KataRepo) DelteById(ctx context.Context, id string) error {
-	_, err := kr.db.NewDelete().Model((*Kata)(nil)).Where("id = ?",id).Exec(ctx)
+	_, err := kr.db.NewDelete().Model((*Kata)(nil)).Where("id = ?", id).Exec(ctx)
 	if err != nil {
 		return err
 	}
@@ -120,6 +121,7 @@ func KataInfoToModel(kataInfo *entity.KataInfo) Kata {
 		Content:    kataInfo.Content,
 		Difficulty: kataInfo.Difficulty,
 		Note:       kataInfo.Note,
+		Lines:      kataInfo.Lines,
 	}
 	if len(kataInfo.Tags) > 0 {
 		for _, tag := range kataInfo.Tags {
@@ -137,6 +139,7 @@ func ModelToKataInfo(kata *Kata) entity.KataInfo {
 		Note:       kata.Note,
 		CreatedAt:  kata.CreatedAt,
 		ID:         kata.ID,
+		Lines:      kata.Lines,
 	}
 	for _, kataTag := range kata.Tags {
 		info.Tags = append(info.Tags, kataTag.Tag)

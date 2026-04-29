@@ -65,6 +65,7 @@ export default function NewKataPage() {
     }
 
     setSubmitting(true);
+    console.log("lines:", content.trim() ? content.trim().split("\n").length : 0);
     try {
       await kataApi.save({
         title: title.trim(),
