@@ -2,17 +2,17 @@
         backend-build backend-start backend-stop backend-restart \
         frontend-start frontend-stop frontend-restart
 
-# ── paths ────────────────────────────────────────────────────────────────────
+
 BACKEND_BIN_CMD   := ./main
 BACKEND_BIN   := main
 BACKEND_DIR   := ./backend/main.go
 FRONTEND_DIR  := ./frontend
 
-# PID files — kept in project root
+
 BACKEND_PID   := .backend.pid
 FRONTEND_PID  := .frontend.pid
 
-# ── composite targets ─────────────────────────────────────────────────────────
+
 all: build start
 
 start: backend-start frontend-start
@@ -23,7 +23,9 @@ restart: backend-restart frontend-restart
 
 build: backend-build
 
-# ── backend ───────────────────────────────────────────────────────────────────
+rebuild: backend-stop backend-build
+
+
 backend-build:
 	@echo "→ building backend…"
 	@go build -o $(BACKEND_BIN) $(BACKEND_DIR)
@@ -48,7 +50,7 @@ backend-stop:
 
 backend-restart: backend-stop backend-start
 
-# ── frontend ──────────────────────────────────────────────────────────────────
+
 frontend-start:
 	@if [ -f $(FRONTEND_PID) ] && kill -0 $$(cat $(FRONTEND_PID)) 2>/dev/null; then \
 		echo "frontend already running (pid $$(cat $(FRONTEND_PID)))"; \
@@ -68,14 +70,13 @@ frontend-stop:
 
 frontend-restart: frontend-stop frontend-start
 
-# ── logs ──────────────────────────────────────────────────────────────────────
+
 logs-backend:
 	@tail -f .backend.log
 
 logs-frontend:
 	@tail -f .frontend.log
 
-# ── status ────────────────────────────────────────────────────────────────────
 status:
 	@if [ -f $(BACKEND_PID) ] && kill -0 $$(cat $(BACKEND_PID)) 2>/dev/null; then \
 		echo "backend:  running (pid $$(cat $(BACKEND_PID)))"; \

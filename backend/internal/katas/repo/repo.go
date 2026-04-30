@@ -115,34 +115,13 @@ func (kr *KataRepo) DelteById(ctx context.Context, id string) error {
 	}
 	return nil
 }
-func KataInfoToModel(kataInfo *entity.KataInfo) Kata {
-	kata := Kata{
-		Title:      kataInfo.Title,
-		Content:    kataInfo.Content,
-		Difficulty: kataInfo.Difficulty,
-		Note:       kataInfo.Note,
-		Lines:      kataInfo.Lines,
+
+func (kr *KataRepo) InsertSolution(ctx context.Context, solveInfo *entity.SolveInfo) error {
+	solve := SolveInfoToModel(solveInfo)
+	_, err := kr.db.NewInsert().Model(&solve).Exec(ctx)
+	if err != nil {
+		return err
 	}
-	if len(kataInfo.Tags) > 0 {
-		for _, tag := range kataInfo.Tags {
-			kata.Tags = append(kata.Tags, KataTag{Tag: tag})
-		}
-	}
-	return kata
+	return nil
 }
 
-func ModelToKataInfo(kata *Kata) entity.KataInfo {
-	info := entity.KataInfo{
-		Title:      kata.Title,
-		Content:    kata.Content,
-		Difficulty: kata.Difficulty,
-		Note:       kata.Note,
-		CreatedAt:  kata.CreatedAt,
-		ID:         kata.ID,
-		Lines:      kata.Lines,
-	}
-	for _, kataTag := range kata.Tags {
-		info.Tags = append(info.Tags, kataTag.Tag)
-	}
-	return info
-}

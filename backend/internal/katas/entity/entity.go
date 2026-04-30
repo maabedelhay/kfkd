@@ -15,6 +15,7 @@ type KataInfo struct {
 	CreatedAt  time.Time `json:"created_at"`
 	Tags       []string  `json:"tags"`
 	Lines      int64     `json:"lines"`
+	ProgLang   string    `json:"prog_lang"`
 }
 
 func (kt *KataInfo) UnmarshalJSON(data []byte) error {
@@ -38,6 +39,15 @@ func (kt *KataInfo) UnmarshalJSON(data []byte) error {
 	kt.Difficulty = kata.Difficulty
 	kt.Tags = kata.Tags
 	kt.Lines = kata.Lines
+	kt.ProgLang = kata.ProgLang
 
 	return nil
+}
+
+type SolveInfo struct {
+	ID          int64     `json:"id"`
+	KataID      int64     `json:"kata_id"`
+	SolvedAt    time.Time `json:"solved_at"`
+	DurationSec int32     `json:"duration_sec"`
+	Quality     int32     `json:"quality"`
 }

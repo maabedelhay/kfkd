@@ -31,8 +31,18 @@ async function requestVoid(path: string, options?: RequestInit): Promise<void> {
 function b64(str: string): string {
   return btoa(String.fromCharCode(...new TextEncoder().encode(str)));
 }
-
+export interface SolvePayload {
+  kata_id: number;
+  duration_sec: number;
+  quality: number;
+}
 export const kataApi = {
+  solve(payload: SolvePayload): Promise<void> {
+    return requestVoid("/solve", {
+      method: "POST",
+      body: JSON.stringify(payload),
+    });
+  },
   list(): Promise<Kata[]> {
     return request<Kata[]>("/kata/list");
   },
@@ -56,3 +66,6 @@ export const kataApi = {
     return requestVoid(`/kata/${id}`, { method: "DELETE" });
   },
 };
+
+
+

@@ -13,6 +13,7 @@ type KataRepo interface {
 	Save(ctx context.Context, kata *entity.KataInfo) error
 	DelteById(ctx context.Context, id string) error
 	List(ctx context.Context) ([]entity.KataInfo, error)
+	InsertSolution(ctx context.Context, solveInfo *entity.SolveInfo) error
 }
 type KataService struct {
 	repo KataRepo
@@ -50,11 +51,12 @@ func (ks *KataService) GetKataByTitle(ctx context.Context, title string) (*entit
 }
 
 func (ks *KataService) Save(ctx context.Context, kata *entity.KataInfo) error {
-	ks.log.Infof("save kata=%s lines=%d", kata.Title, kata.Lines)
+
 	if err := ks.repo.Save(ctx, kata); err != nil {
-		ks.log.Error()
+		ks.log.Errorf("save kata=%s: %v", kata.Title, err)
 		return err
 	}
+	ks.log.Infof("save kata=%s: success", kata.Title)
 	return nil
 }
 
@@ -82,5 +84,14 @@ func (ks *KataService) DelteById(ctx context.Context, id string) error {
 		ks.log.Errorf("delete by id=%s: %v", id, err)
 		return nil
 	}
+	return nil
+}
+
+func (ks *KataService) SaveSolution(ctx context.Context, solveInfo *entity.SolveInfo) error {
+	if err := ks.repo.InsertSolution(ctx, solveInfo); err != nil {
+		ks.log.Errorf("save solution: %v", err)
+		return err
+	}
+	ks.log.Infof("save solution: success")
 	return nil
 }
