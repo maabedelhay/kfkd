@@ -51,3 +51,8 @@ type SolveInfo struct {
 	DurationSec int32     `json:"duration_sec"`
 	Quality     int32     `json:"quality"`
 }
+
+type DailySolveCount struct {
+    Date  string `json:"date"`  
+    Count int    `json:"count"`
+}

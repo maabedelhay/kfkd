@@ -125,3 +125,21 @@ func (kr *KataRepo) InsertSolution(ctx context.Context, solveInfo *entity.SolveI
 	return nil
 }
 
+// count ber date how many entry. group by same date.
+
+func (kr *KataRepo) CountSolvePerDate(ctx context.Context) (map[string]int, error) {
+	var result []struct {
+		Date  string `bun:"date"`
+		Count int    `bun:"count"`
+	}
+
+	err := kr.db.NewSelect().Model((*Solve)(nil)).ColumnExpr("DATE(solved_at) as date").ColumnExpr("COUNT(id) as count").GroupExpr("DATE(solved_at)").OrderExpr("DATE(solved_at) ASC").Scan(ctx, &result)
+	if err != nil {
+		return nil, err
+	}
+	dateCount := make(map[string]int, 0)
+	for _, r := range result {
+		dateCount[r.Date] = r.Count
+	}
+	return dateCount, nil
+}

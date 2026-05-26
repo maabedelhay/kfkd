@@ -36,6 +36,12 @@ export interface SolvePayload {
   duration_sec: number;
   quality: number;
 }
+export interface DayActivity {
+  date: string;
+  count: number;
+}
+
+
 export const kataApi = {
   solve(payload: SolvePayload): Promise<void> {
     return requestVoid("/solve", {
@@ -64,6 +70,10 @@ export const kataApi = {
 
   delete(id: number): Promise<void> {
     return requestVoid(`/kata/${id}`, { method: "DELETE" });
+  },
+
+  activity(): Promise<DayActivity[]> {
+    return request<DayActivity[]>("/kata/solved");
   },
 };
 

@@ -2,6 +2,7 @@ package service
 
 import (
 	"context"
+	"time"
 
 	"github.com/maabedelhay/kfkd/backend/internal/katas/entity"
 	"github.com/sirupsen/logrus"
@@ -14,6 +15,7 @@ type KataRepo interface {
 	DelteById(ctx context.Context, id string) error
 	List(ctx context.Context) ([]entity.KataInfo, error)
 	InsertSolution(ctx context.Context, solveInfo *entity.SolveInfo) error
+	CountSolvePerDate(ctx context.Context) (map[string]int, error)
 }
 type KataService struct {
 	repo KataRepo
@@ -94,4 +96,37 @@ func (ks *KataService) SaveSolution(ctx context.Context, solveInfo *entity.Solve
 	}
 	ks.log.Infof("save solution: success")
 	return nil
+}
+
+// return 6 monthes from today. recive the cap (the request day) and get six monthes from it
+// maybe i can give back an array of int for 6 months each index is a day and fill the other days with 0? no
+
+// SolvedPerDay returns solve counts for the last 6 months (inclusive of today).
+// If endDate is nil, uses time.Now().UTC().
+func (ks *KataService) SolvedPerDay(ctx context.Context, reqEndDate *time.Time) ([]entity.DailySolveCount, error) {
+
+	var end time.Time
+	if reqEndDate != nil {
+		end = reqEndDate.UTC()
+	} else {
+		end = time.Now().UTC()
+	}
+
+	start := end.AddDate(-1, 0, 0)
+
+	actualCount, err := ks.repo.CountSolvePerDate(ctx)
+	if err != nil {
+		return nil, err
+	}
+	ks.log.Infof("solved per day \n%v",actualCount)
+	days := make([]entity.DailySolveCount, 0)
+	for d := start ; d.Before(end) || d.Equal(end); d = d.AddDate(0,0,1) {
+		dateStr := d.Format("2006-01-02")
+		count := actualCount[dateStr]
+		days = append(days, entity.DailySolveCount{
+			Date: dateStr,
+			Count: count,
+		})
+	}
+	return days, nil
 }

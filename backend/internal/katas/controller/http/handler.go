@@ -4,6 +4,7 @@ import (
 	"context"
 	"encoding/json"
 	"net/http"
+	"time"
 
 	"github.com/maabedelhay/kfkd/backend/internal/katas/entity"
 	"github.com/maabedelhay/kfkd/backend/internal/katas/service"
@@ -17,6 +18,7 @@ type KataService interface {
 	GetKataById(ctx context.Context, id string) (*entity.KataInfo, error)
 	List(ctx context.Context) ([]entity.KataInfo, error)
 	SaveSolution(ctx context.Context, solveInfo *entity.SolveInfo) error
+	SolvedPerDay(ctx context.Context, reqEndDate *time.Time) ([]entity.DailySolveCount, error)
 }
 type Controler struct {
 	ks  KataService
@@ -145,4 +147,22 @@ func (ctr *Controler) Delete(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	w.WriteHeader(http.StatusOK)
+}
+
+func (ctr *Controler) HandleSolvedPerDay(w http.ResponseWriter, r *http.Request) {
+	ctx := r.Context()
+
+	solveDays, err := ctr.ks.SolvedPerDay(ctx, nil)
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+	}
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(http.StatusOK)
+	resp, err := json.Marshal(solveDays)
+	if err != nil {
+		ctr.log.Errorf("handle solve per day marshal json: %v",err)
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+	}
+	ctr.log.Debug(string(resp))
+	w.Write(resp)
 }

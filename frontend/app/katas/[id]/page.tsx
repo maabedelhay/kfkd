@@ -1,22 +1,22 @@
 "use client";
 
-import { useEffect, useState, useCallback } from "react";
+import { useEffect, useState } from "react";
 import { useParams, useRouter } from "next/navigation";
 import Link from "next/link";
 import { ArrowLeft, Calendar, Check, Hash, Save, StickyNote, Timer, Trash2 } from "lucide-react";
-import { kataApi, SolvePayload } from "@/lib/api";
+import { kataApi } from "@/lib/api";
 import { Kata } from "@/types/kata";
 import { DifficultyBadge } from "@/components/difficulty-badge";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
+import { CodeEditor } from "@/components/code-editor";
 
 function formatDate(iso: string) {
-  return new Date(iso).toLocaleDateString("en-GB", {
-    day: "2-digit",
-    month: "short",
-    year: "numeric",
-  });
+  const d = new Date(iso);
+  return `${String(d.getUTCDate()).padStart(2, "0")} ${
+    ["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"][d.getUTCMonth()]
+  } ${d.getUTCFullYear()}`;
 }
 
 export default function KataDetailPage() {
@@ -37,6 +37,21 @@ export default function KataDetailPage() {
   const [quality, setQuality] = useState<number>(3);
   const [durationSec, setDurationSec] = useState<number>(0);
   const [solveStatus, setSolveStatus] = useState<"idle" | "solving" | "solved" | "error">("idle");
+
+  useEffect(() => {
+    if (!id) return;
+    kataApi
+      .get(id)
+      .then((data) => {
+        setKata(data);
+        setContent(data.content ?? "");
+        setNote(data.note ?? "");
+      })
+      .catch((e) => {
+        setError(e instanceof Error ? e.message : "Failed to load kata");
+      })
+      .finally(() => setLoading(false));
+  }, [id]);
 
   async function handleDelete() {
     if (!kata) return;
@@ -89,40 +104,6 @@ export default function KataDetailPage() {
     }
   }
 
-  useEffect(() => {
-    if (!id) return;
-    kataApi
-      .get(id)
-      .then((data) => {
-        setKata(data);
-        setContent(data.content ?? "");
-        setNote(data.note ?? "");
-      })
-      .catch((e) => {
-        setError(e instanceof Error ? e.message : "Failed to load kata");
-      })
-      .finally(() => setLoading(false));
-  }, [id]);
-
-  const handleTabKey = useCallback(
-    (e: React.KeyboardEvent<HTMLTextAreaElement>) => {
-      if (e.key === "Tab") {
-        e.preventDefault();
-        const el = e.currentTarget;
-        const start = el.selectionStart;
-        const end = el.selectionEnd;
-        const newValue =
-          code.substring(0, start) + "  " + code.substring(end);
-        setCode(newValue);
-        // restore cursor after state update
-        requestAnimationFrame(() => {
-          el.selectionStart = el.selectionEnd = start + 2;
-        });
-      }
-    },
-    [code]
-  );
-
   if (loading) {
     return (
       <div className="flex flex-1 items-center justify-center text-sm text-zinc-400">
@@ -168,7 +149,6 @@ export default function KataDetailPage() {
         <div className="flex items-center gap-2 mx-auto border border-zinc-200 rounded-lg px-3 py-1.5 bg-zinc-50">
           <Timer className="h-3.5 w-3.5 text-zinc-400 shrink-0" />
 
-          {/* Duration: mm:ss spinners */}
           <div className="flex items-center gap-1 text-sm font-mono">
             <input
               type="number"
@@ -197,7 +177,6 @@ export default function KataDetailPage() {
 
           <Separator orientation="vertical" className="h-4" />
 
-          {/* Quality 1–5 */}
           <div className="flex items-center gap-1">
             {[1, 2, 3, 4, 5].map((q) => (
               <button
@@ -216,7 +195,6 @@ export default function KataDetailPage() {
 
           <Separator orientation="vertical" className="h-4" />
 
-          {/* Solve button */}
           <Button
             size="sm"
             onClick={handleSolve}
@@ -296,17 +274,16 @@ export default function KataDetailPage() {
 
           <Separator />
 
-          {/* Content */}
+          {/* Content — editable with syntax highlight */}
           <div>
             <p className="text-xs font-medium text-zinc-500 uppercase tracking-wider mb-2">
-              Description
+              Kata
             </p>
-            <textarea
+            <CodeEditor
               value={content}
-              onChange={(e) => setContent(e.target.value)}
-              placeholder="Describe the kata problem…"
-              spellCheck={false}
-              className="w-full resize-none rounded-md border border-zinc-200 bg-white px-3 py-2 text-sm text-zinc-700 leading-relaxed placeholder:text-zinc-300 focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-zinc-400 min-h-[700px]"
+              onChange={setContent}
+              placeholder="// kata code here…"
+              minHeight="700px"
             />
           </div>
 
@@ -327,21 +304,22 @@ export default function KataDetailPage() {
           </div>
         </div>
 
-        {/* Right — code editor */}
+        {/* Right — scratch pad with syntax highlight */}
         <div className="flex-1 flex flex-col overflow-hidden">
           <div className="px-4 py-2 border-b border-zinc-100 shrink-0">
             <span className="text-xs text-zinc-400 font-medium uppercase tracking-wider">
               Scratch pad
             </span>
           </div>
-          <textarea
-            value={code}
-            onChange={(e) => setCode(e.target.value)}
-            onKeyDown={handleTabKey}
-            spellCheck={false}
-            placeholder="// Write your solution here…"
-            className="flex-1 w-full resize-none border-0 outline-none px-6 py-4 text-sm font-mono text-zinc-800 placeholder:text-zinc-300 bg-white leading-relaxed"
-          />
+          <div className="flex-1 overflow-auto p-4">
+            <CodeEditor
+              value={code}
+              onChange={setCode}
+              placeholder="// Write your solution here…"
+              minHeight="100%"
+              className="h-full"
+            />
+          </div>
         </div>
       </div>
     </div>
