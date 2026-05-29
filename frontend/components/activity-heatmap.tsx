@@ -18,23 +18,20 @@ export function ActivityHeatmap({ data }: ActivityHeatmapProps) {
   if (!data || data.length === 0) return null;
 
   // Group by week — each week is a column of up to 7 days
-  // First day determines the starting weekday offset
   const firstDate = new Date(data[0].date + "T00:00:00Z");
   const startOffset = firstDate.getUTCDay(); // 0 = Sun
 
-  // Pad start so day 0 lands in the right row
   const padded: (DayActivity | null)[] = [
     ...Array(startOffset).fill(null),
     ...data,
   ];
 
-  // Split into weeks (columns of 7)
   const weeks: (DayActivity | null)[][] = [];
   for (let i = 0; i < padded.length; i += 7) {
     weeks.push(padded.slice(i, i + 7));
   }
 
-  // Month labels: find first occurrence of each month in the data
+  // Month labels
   const monthLabels: { label: string; weekIndex: number }[] = [];
   let lastMonth = -1;
   weeks.forEach((week, wi) => {
@@ -51,6 +48,9 @@ export function ActivityHeatmap({ data }: ActivityHeatmapProps) {
   const totalSolves = data.reduce((sum, d) => sum + d.count, 0);
   const activeDays = data.filter((d) => d.count > 0).length;
 
+  // Approximate grid height: 7 rows * (11px + 3px gap) - last gap
+  const gridHeight = 7 * 11 + 6 * 3; // 95px
+
   return (
     <div className="mb-6">
       <div className="flex items-center justify-between mb-2">
@@ -63,7 +63,7 @@ export function ActivityHeatmap({ data }: ActivityHeatmapProps) {
       </div>
 
       <div className="border border-zinc-600 rounded-lg p-4 bg-lime-50 overflow-x-auto">
-        {/* Month labels */}
+        {/* Month labels row */}
         <div className="flex gap-[3px] mb-1 ml-0">
           {weeks.map((_, wi) => {
             const label = monthLabels.find((m) => m.weekIndex === wi);
@@ -79,8 +79,9 @@ export function ActivityHeatmap({ data }: ActivityHeatmapProps) {
           })}
         </div>
 
-        {/* Grid */}
-        <div className="flex gap-[3px]">
+        {/* Grid row with GIF on the right */}
+        <div className="flex gap-[3px] items-start">
+          {/* Week columns */}
           {weeks.map((week, wi) => (
             <div key={wi} className="flex flex-col gap-[3px]">
               {Array.from({ length: 7 }).map((_, di) => {
@@ -88,7 +89,11 @@ export function ActivityHeatmap({ data }: ActivityHeatmapProps) {
                 return (
                   <div
                     key={di}
-                    title={day ? `${day.date}: ${day.count} solve${day.count !== 1 ? "s" : ""}` : ""}
+                    title={
+                      day
+                        ? `${day.date}: ${day.count} solve${day.count !== 1 ? "s" : ""}`
+                        : ""
+                    }
                     className={`w-[11px] h-[11px] rounded-sm transition-colors ${
                       day ? getColor(day.count) : "bg-transparent"
                     }`}
@@ -97,6 +102,15 @@ export function ActivityHeatmap({ data }: ActivityHeatmapProps) {
               })}
             </div>
           ))}
+
+          {/* GIF – fits vertically inside the heatmap area */}
+          <div className="ml-4 flex items-center" style={{ height: gridHeight }}>
+            <img
+              src="../../touphStickT.gif"
+              alt="touph animation"
+              className="max-h-full max-w-[150px] object-contain rounded"
+            />
+          </div>
         </div>
 
         {/* Legend */}
