@@ -9,15 +9,16 @@ import (
 type Kata struct {
 	bun.BaseModel `bun:"table:kata"`
 
-	ID         int64     `bun:",pk,autoincrement"`
-	Title      string    `bun:",notnull,unique"`
-	Content    string    `bun:",notnull"`
-	Note       string    `bun:""`
-	Difficulty string    `bun:""`
-	CreatedAt  time.Time `bun:",default:current_timestamp"`
-	Lines      int64     `bun:""`
-	ProgLang   string    `bun:""`
-	Tags       []KataTag `bun:"rel:has-many,join:id=kata_id"`
+	ID           int64     `bun:",pk,autoincrement"`
+	Title        string    `bun:",notnull,unique"`
+	Content      string    `bun:",notnull"`
+	Note         string    `bun:""`
+	Difficulty   string    `bun:""`
+	CreatedAt    time.Time `bun:",default:current_timestamp"`
+	LastSolvedAt time.Time `bun:""`
+	Lines        int64     `bun:""`
+	ProgLang     string    `bun:""`
+	Tags         []KataTag `bun:"rel:has-many,join:id=kata_id"`
 }
 
 type KataTag struct {

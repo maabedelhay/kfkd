@@ -131,7 +131,7 @@ export default function KataDetailPage() {
   return (
     <div className="flex flex-col flex-1 h-full">
       {/* Topbar */}
-      <div className="px-6 py-3 border-b border-zinc-200 flex items-center gap-3 shrink-0">
+      <div className="px-6 py-3 border-b border-zinc-500 flex items-center gap-3 shrink-0">
         {/* Left — back + title */}
         <Button variant="ghost" size="sm" asChild className="-ml-2">
           <Link href="/katas">
@@ -146,7 +146,7 @@ export default function KataDetailPage() {
         <DifficultyBadge difficulty={kata.difficulty} />
 
         {/* Center — solve panel */}
-        <div className="flex items-center gap-2 mx-auto border border-zinc-200 rounded-lg px-3 py-1.5 bg-zinc-50">
+        <div className="flex items-center gap-2 mx-auto border border-zinc-500 rounded-lg px-3 py-1.5 bg-lime-50">
           <Timer className="h-3.5 w-3.5 text-zinc-400 shrink-0" />
 
           <div className="flex items-center gap-1 text-sm font-mono">
@@ -248,7 +248,7 @@ export default function KataDetailPage() {
       {/* Split pane */}
       <div className="flex flex-1 overflow-hidden" style={{ height: "calc(100vh - 105px)" }}>
         {/* Left — kata info */}
-        <div className="w-[800px] shrink-0 border-r border-zinc-200 overflow-y-auto px-6 py-6 flex flex-col gap-5">
+        <div className="w-[800px] shrink-0 border-r border-zinc-500 overflow-y-auto px-6 py-6 flex flex-col gap-5">
           {/* Meta row */}
           <div className="flex flex-wrap items-center gap-3 text-xs text-zinc-400">
             <span className="flex items-center gap-1">

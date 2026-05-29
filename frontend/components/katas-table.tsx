@@ -26,38 +26,35 @@ export function KatasTable({ katas }: KatasTableProps) {
   }
 
   return (
-    <div className="rounded-lg border border-zinc-200 overflow-hidden">
+    <div className="rounded-lg border border-zinc-600 overflow-hidden">
       <table className="w-full text-sm">
         <thead>
-          <tr className="bg-zinc-100 border-b border-zinc-200">
-            <th className="text-left px-4 py-3 font-medium text-zinc-500">Title</th>
-            <th className="text-left px-4 py-3 font-medium text-zinc-500">Difficulty</th>
-            <th className="text-left px-4 py-3 font-medium text-zinc-500">Lines</th>
-            <th className="text-left px-4 py-3 font-medium text-zinc-500">Tags</th>
-            <th className="text-left px-4 py-3 font-medium text-zinc-500">Added</th>
+          <tr className="bg-everforest-bg-soft border-b border-zinc-600">
+            <th className="text-left px-4 py-3 font-medium text-everforest-foreground/70">Title</th>
+            <th className="text-left px-4 py-3 font-medium text-everforest-foreground/70">Difficulty</th>
+            <th className="text-left px-4 py-3 font-medium text-everforest-foreground/70">Lines</th>
+            <th className="text-left px-4 py-3 font-medium text-everforest-foreground/70">Tags</th>
+            <th className="text-left px-4 py-3 font-medium text-everforest-foreground/70">Added</th>
+            <th className="text-left px-4 py-3 font-medium text-everforest-foreground/70">Last Solved</th>
           </tr>
         </thead>
         <tbody>
           {katas.map((kata, i) => (
             <tr
               key={kata.id}
-              className={`group relative transition-colors bg-white hover:bg-zinc-50 ${
-                i !== katas.length - 1 ? "border-b border-zinc-100" : ""
+              className={`group relative transition-colors bg-background hover:bg-everforest-bg-soft ${
+                i !== katas.length - 1 ? "border-b border-zinc-600" : ""
               }`}
             >
-              <td className="px-4 py-3 font-medium text-zinc-900 relative">
-                <Link
-                  href={`/katas/${kata.id}`}
-                  className="absolute inset-0"
-                  aria-label={`Open ${kata.title}`}
-                />
+              <td className="px-4 py-3 font-medium text-foreground relative">
+                <Link href={`/katas/${kata.id}`} className="absolute inset-0" />
                 {kata.title}
               </td>
               <td className="px-4 py-3 relative">
                 <Link href={`/katas/${kata.id}`} className="absolute inset-0" tabIndex={-1} />
                 <DifficultyBadge difficulty={kata.difficulty} />
               </td>
-              <td className="px-4 py-3 text-zinc-500 tabular-nums relative">
+              <td className="px-4 py-3 text-everforest-foreground/70 tabular-nums relative">
                 <Link href={`/katas/${kata.id}`} className="absolute inset-0" tabIndex={-1} />
                 {kata.lines}
               </td>
@@ -65,15 +62,19 @@ export function KatasTable({ katas }: KatasTableProps) {
                 <Link href={`/katas/${kata.id}`} className="absolute inset-0" tabIndex={-1} />
                 <div className="flex flex-wrap gap-1 pointer-events-none">
                   {kata.tags?.map((tag) => (
-                    <Badge key={tag} variant="outline">
+                    <Badge key={tag} variant="outline" className="border-zinc-600 text-foreground">
                       {tag}
                     </Badge>
                   ))}
                 </div>
               </td>
-              <td className="px-4 py-3 text-zinc-400 tabular-nums relative">
+              <td className="px-4 py-3 text-everforest-foreground/50 tabular-nums relative">
                 <Link href={`/katas/${kata.id}`} className="absolute inset-0" tabIndex={-1} />
                 {formatDate(kata.created_at)}
+              </td>
+              <td className="px-4 py-3 text-everforest-foreground/50 tabular-nums relative">
+                <Link href={`/katas/${kata.id}`} className="absolute inset-0" tabIndex={-1} />
+                {formatDate(kata.last_solved_at)}
               </td>
             </tr>
           ))}

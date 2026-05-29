@@ -5,7 +5,7 @@ interface ActivityHeatmapProps {
 }
 
 function getColor(count: number): string {
-  if (count === 0) return "bg-zinc-100";
+  if (count === 0) return "bg-zinc-200";
   if (count === 1) return "bg-emerald-200";
   if (count === 2) return "bg-emerald-300";
   if (count === 3) return "bg-emerald-400";
@@ -62,7 +62,7 @@ export function ActivityHeatmap({ data }: ActivityHeatmapProps) {
         </span>
       </div>
 
-      <div className="border border-zinc-200 rounded-lg p-4 bg-white overflow-x-auto">
+      <div className="border border-zinc-600 rounded-lg p-4 bg-lime-50 overflow-x-auto">
         {/* Month labels */}
         <div className="flex gap-[3px] mb-1 ml-0">
           {weeks.map((_, wi) => {
@@ -102,7 +102,7 @@ export function ActivityHeatmap({ data }: ActivityHeatmapProps) {
         {/* Legend */}
         <div className="flex items-center gap-1 mt-3 justify-end">
           <span className="text-[10px] text-zinc-400 mr-1">Less</span>
-          {["bg-zinc-100", "bg-emerald-200", "bg-emerald-300", "bg-emerald-400", "bg-emerald-600"].map((c) => (
+          {["bg-zinc-200", "bg-emerald-200", "bg-emerald-300", "bg-emerald-400", "bg-emerald-600"].map((c) => (
             <div key={c} className={`w-[11px] h-[11px] rounded-sm ${c}`} />
           ))}
           <span className="text-[10px] text-zinc-400 ml-1">More</span>

@@ -4,6 +4,7 @@ import (
 	"context"
 	"database/sql"
 	"strconv"
+	"time"
 
 	"github.com/maabedelhay/kfkd/backend/internal/katas/entity"
 	"github.com/uptrace/bun"
@@ -118,11 +119,18 @@ func (kr *KataRepo) DelteById(ctx context.Context, id string) error {
 
 func (kr *KataRepo) InsertSolution(ctx context.Context, solveInfo *entity.SolveInfo) error {
 	solve := SolveInfoToModel(solveInfo)
-	_, err := kr.db.NewInsert().Model(&solve).Exec(ctx)
-	if err != nil {
-		return err
-	}
-	return nil
+	lastSolveAt := time.Now()
+	return kr.db.RunInTx(ctx, nil, func(ctx context.Context, tx bun.Tx) error {
+		_, err := tx.NewUpdate().Model((*Kata)(nil)).Set("last_solved_at = ?", lastSolveAt).Where("id = ?",solveInfo.KataID).Exec(ctx)
+		if err != nil {
+			return err
+		}
+		_, err = tx.NewInsert().Model(&solve).Exec(ctx)
+		if err != nil {
+			return err
+		}
+		return nil
+	})
 }
 
 // count ber date how many entry. group by same date.

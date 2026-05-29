@@ -9,6 +9,7 @@ export interface Kata {
   note: string;      // plain text
   difficulty: Difficulty;
   created_at: string;
+  last_solved_at: string;
   tags: string[];    // backend returns []string
 }
 

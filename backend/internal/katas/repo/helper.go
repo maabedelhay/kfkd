@@ -26,6 +26,7 @@ func ModelToKataInfo(kata *Kata) entity.KataInfo {
 		Difficulty: kata.Difficulty,
 		Note:       kata.Note,
 		CreatedAt:  kata.CreatedAt,
+		LastSolvedAt: kata.LastSolvedAt,
 		ID:         kata.ID,
 		Lines:      kata.Lines,
 		ProgLang:   kata.ProgLang,

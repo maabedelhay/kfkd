@@ -7,15 +7,16 @@ import (
 )
 
 type KataInfo struct {
-	ID         int64     `json:"id"`
-	Title      string    `json:"title"`
-	Content    string    `json:"content"`
-	Note       string    `json:"note"`
-	Difficulty string    `json:"difficulty"`
-	CreatedAt  time.Time `json:"created_at"`
-	Tags       []string  `json:"tags"`
-	Lines      int64     `json:"lines"`
-	ProgLang   string    `json:"prog_lang"`
+	ID           int64     `json:"id"`
+	Title        string    `json:"title"`
+	Content      string    `json:"content"`
+	Note         string    `json:"note"`
+	Difficulty   string    `json:"difficulty"`
+	CreatedAt    time.Time `json:"created_at"`
+	LastSolvedAt time.Time `json:"last_solved_at"`
+	Tags         []string  `json:"tags"`
+	Lines        int64     `json:"lines"`
+	ProgLang     string    `json:"prog_lang"`
 }
 
 func (kt *KataInfo) UnmarshalJSON(data []byte) error {
@@ -53,6 +54,6 @@ type SolveInfo struct {
 }
 
 type DailySolveCount struct {
-    Date  string `json:"date"`  
-    Count int    `json:"count"`
+	Date  string `json:"date"`
+	Count int    `json:"count"`
 }
