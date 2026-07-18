@@ -1,95 +1,109 @@
 ![logo](frontend/public/kfkd_logo.png)
 
+
 # Katas For Knowledge Distillation
 
-A personal tool for tracking and practicing coding katas. Write them down, solve them, track your progress over time.
-
-
+A personal tool for tracking and practicing coding katas.
 
 ---
 
-## What it does
-
-- **Log katas** — store the kata code, notes, difficulty, and tags
-- **Practice** — open a kata to get a split view: kata on the left, scratch pad on the right with Go syntax highlighting and a focus mode to block distractions
-- **Track solves** — record each solve attempt with a duration and a quality rating (1–5)
-- **Visualise activity** — a GitHub-style heatmap shows your solve history over the last 6 months
-
+## Branches
+ 
+| Branch | Description |
+|---|---|
+| `main` | Full app — Go backend + Next.js frontend with SQLite |
+| `demo` | Static frontend-only demo, deployable to GitHub Pages |
+ 
 ---
-
-## Stack
-
+ 
+## `main` — full app
+ 
+### Stack
+ 
 | Layer | Tech |
 |---|---|
-| Backend | Go, SQLite (`bun` ORM) |
+| Backend | Go, SQLite (bun ORM) |
 | Frontend | Next.js 15, TypeScript, Tailwind v4, shadcn/ui |
 | Package manager | pnpm |
-
----
-
-## Project structure
-
-```
-├── backend/
-│   └── internal/katas/
-│       ├── controller/http/   # HTTP handlers, router, middleware
-│       ├── entity/            # Domain types
-│       ├── repo/              # SQLite queries
-│       └── service/           # Business logic
-├── frontend/
-│   ├── app/
-│   │   ├── katas/             # List page (table + heatmap)
-│   │   ├── katas/new/         # Add kata form
-│   │   └── katas/[id]/        # Kata detail + scratch pad
-│   ├── components/            # UI components
-│   └── lib/                   # API client
-├── sqlitekatas.db
-└── Makefile
-```
-
----
-
-## Getting started
-
+ 
 ### Prerequisites
-
+ 
 - Go 1.22+
 - Node.js 18+
-- pnpm
-
+- pnpm — `npm install -g pnpm`
 ### Run
-
+ 
+**1. Clone**
+ 
 ```bash
-# Clone
-git clone https://github.com/you/katas.git
-cd katas
-
-# Start both backend and frontend
-make start
-
-# Or individually
-make backend-start
-make frontend-start
+git clone https://github.com/maabedelhay/kfkd.git
+cd kfkd
 ```
-
-Backend runs on `http://localhost:8083`, frontend on `http://localhost:3000`.
-
-### Other make commands
-
+ 
+**2. Start the backend**
+ 
 ```bash
-make stop              # stop both
-make restart           # rebuild and restart both
-make backend-restart   # rebuild and restart backend only
-make frontend-restart  # restart frontend only
-make status            # check what's running
-make logs-backend      # tail backend logs
-make logs-frontend     # tail frontend logs
+go build -o main ./backend/...
+./main
 ```
-
+ 
+Backend runs on `http://localhost:8083`.
+ 
+**3. Install and start the frontend**
+ 
+```bash
+cd frontend
+pnpm install
+pnpm dev
+```
+ 
+Frontend runs on `http://localhost:3000`.
+ 
+### Stop
+ 
+Kill the backend with `Ctrl+C` in its terminal, same for the frontend.
+ 
+If the frontend port stays occupied:
+ 
+```bash
+kill -9 $(lsof -ti :3000)
+```
+ 
 ---
-
-## API
-
+ 
+## `demo` — static GitHub Pages deploy
+ 
+The demo branch serves a static HTML preview with mock data and no backend.
+ 
+### Build locally
+ 
+```bash
+git checkout demo
+cd frontend
+pnpm install
+pnpm build
+```
+ 
+Output goes to `frontend/out/`. Open `frontend/out/index.html` in a browser or serve with:
+ 
+```bash
+python3 -m http.server -d frontend/out
+```
+ 
+### Deploy to GitHub Pages
+ 
+```bash
+cd frontend
+pnpm build
+git add out/
+git commit -m "build"
+git subtree push --prefix frontend/out origin gh-pages
+```
+ 
+---
+ 
+## API (`main` branch only)
+ 
 | Method | Path | Description |
 |---|---|---|
 | `GET` | `/kata/list` | List all katas |
@@ -97,12 +111,12 @@ make logs-frontend     # tail frontend logs
 | `POST` | `/kata` | Create or update a kata (upsert on title, updates `content` and `note`) |
 | `DELETE` | `/kata/{id}` | Delete a kata |
 | `POST` | `/solve` | Record a solve attempt |
-| `GET` | `/kata/solved` | Get daily solve counts for the last 6 months |
-
+| `GET` | `/kata/solved` | Daily solve counts for the last 6 months |
+ 
 ### Kata payload
-
-`content` and `note` must be **base64-encoded** when sending to the API. The frontend handles this automatically.
-
+ 
+`content` and `note` must be **base64-encoded**. The frontend handles this automatically.
+ 
 ```json
 {
   "title": "Fibonacci",
@@ -113,9 +127,9 @@ make logs-frontend     # tail frontend logs
   "tags": ["recursion", "math"]
 }
 ```
-
+ 
 ### Solve payload
-
+ 
 ```json
 {
   "kata_id": 1,
@@ -123,27 +137,9 @@ make logs-frontend     # tail frontend logs
   "quality": 4
 }
 ```
-
+ 
 ---
-
-## Usage
-
-### Adding a kata
-
-Click **Add kata** on the list page, fill in the title, paste the kata code into the content field, set difficulty and tags, and save.
-
-### Practicing
-
-Click any row in the table to open the kata. The left panel shows the kata code and your notes (both editable). The right panel is a scratch pad to write your solution. Hit **Focus** to dim the left panel and concentrate on the code.
-
-When done, set the duration and quality (1–5), then hit **Solve** to record the attempt. Hit **Save** to persist any edits to the kata or notes.
-
-### Activity heatmap
-
-The heatmap on the list page shows how many katas you solved each day over the last 6 months — darker green means more solves.
-
----
-
+ 
 ## License
-
+ 
 MIT
