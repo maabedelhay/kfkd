@@ -51,7 +51,14 @@ export default async function KatasPage() {
       </div>
 
       <ActivityHeatmap data={activity} />
-
+      <div className="items-center">
+                      {/* <img
+              src="../../skyanimestaff.png"
+              alt="touph animation"
+               className="w-full h-32 object-cover rounded mb-6"
+            /> */}
+            {/* <h1 className="    mb-6">Staff Enigneer ...</h1> */}
+      </div>
       {error ? (
         <div className="rounded-lg border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700">
           {error}

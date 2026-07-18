@@ -3,7 +3,7 @@
 import { useEffect, useState } from "react";
 import { useParams, useRouter } from "next/navigation";
 import Link from "next/link";
-import { ArrowLeft, Calendar, Check, Hash, Save, StickyNote, Timer, Trash2 } from "lucide-react";
+import { ArrowLeft, Calendar, Check, Hash, Maximize2, Minimize2, Save, StickyNote, Timer, Trash2 } from "lucide-react";
 import { kataApi } from "@/lib/api";
 import { Kata } from "@/types/kata";
 import { DifficultyBadge } from "@/components/difficulty-badge";
@@ -33,7 +33,7 @@ export default function KataDetailPage() {
   const [deleting, setDeleting] = useState(false);
   const [saveStatus, setSaveStatus] = useState<"idle" | "saving" | "saved" | "error">("idle");
 
-  // solve panel
+  const [focusMode, setFocusMode] = useState(false);
   const [quality, setQuality] = useState<number>(3);
   const [durationSec, setDurationSec] = useState<number>(0);
   const [solveStatus, setSolveStatus] = useState<"idle" | "solving" | "solved" | "error">("idle");
@@ -131,8 +131,8 @@ export default function KataDetailPage() {
   return (
     <div className="flex flex-col flex-1 h-full">
       {/* Topbar */}
-      <div className="px-6 py-3 border-b border-zinc-500 flex items-center gap-3 shrink-0">
-        {/* Left — back + title */}
+      <div className="px-6 py-3 border-b border-zinc-200 flex items-center gap-3 shrink-0">
+        {/* Left */}
         <Button variant="ghost" size="sm" asChild className="-ml-2">
           <Link href="/katas">
             <ArrowLeft className="h-4 w-4" />
@@ -146,7 +146,7 @@ export default function KataDetailPage() {
         <DifficultyBadge difficulty={kata.difficulty} />
 
         {/* Center — solve panel */}
-        <div className="flex items-center gap-2 mx-auto border border-zinc-500 rounded-lg px-3 py-1.5 bg-lime-50">
+        <div className="flex items-center gap-2 mx-auto border border-zinc-200 rounded-lg px-3 py-1.5 bg-zinc-50">
           <Timer className="h-3.5 w-3.5 text-zinc-400 shrink-0" />
 
           <div className="flex items-center gap-1 text-sm font-mono">
@@ -235,6 +235,7 @@ export default function KataDetailPage() {
             {saveStatus === "saving" ? "Saving…" : saveStatus === "saved" ? "Saved" : "Save"}
           </Button>
           <Button
+            // variant="destructive"
             size="sm"
             onClick={handleDelete}
             disabled={deleting || saveStatus === "saving"}
@@ -248,7 +249,7 @@ export default function KataDetailPage() {
       {/* Split pane */}
       <div className="flex flex-1 overflow-hidden" style={{ height: "calc(100vh - 105px)" }}>
         {/* Left — kata info */}
-        <div className="w-[800px] shrink-0 border-r border-zinc-500 overflow-y-auto px-6 py-6 flex flex-col gap-5">
+        <div className={`w-[560px] shrink-0 border-r border-zinc-200 overflow-y-auto px-6 py-6 flex flex-col gap-5 transition-opacity duration-300 ${focusMode ? "opacity-15 pointer-events-none select-none" : "opacity-100"}`}>
           {/* Meta row */}
           <div className="flex flex-wrap items-center gap-3 text-xs text-zinc-400">
             <span className="flex items-center gap-1">
@@ -283,7 +284,7 @@ export default function KataDetailPage() {
               value={content}
               onChange={setContent}
               placeholder="// kata code here…"
-              minHeight="700px"
+              minHeight="450px"
             />
           </div>
 
@@ -299,17 +300,30 @@ export default function KataDetailPage() {
               onChange={(e) => setNote(e.target.value)}
               placeholder="Personal notes or hints…"
               spellCheck={false}
-              className="w-full resize-none rounded-md border border-zinc-200 bg-white px-3 py-2 text-sm text-zinc-600 leading-relaxed placeholder:text-zinc-300 focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-zinc-400 min-h-[250px]"
+              className="w-full resize-none rounded-md border border-zinc-200 bg-white px-3 py-2 text-base text-zinc-600 leading-relaxed placeholder:text-zinc-300 focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-zinc-400 min-h-[450px]"
             />
           </div>
         </div>
 
         {/* Right — scratch pad with syntax highlight */}
         <div className="flex-1 flex flex-col overflow-hidden">
-          <div className="px-4 py-2 border-b border-zinc-100 shrink-0">
+          <div className="px-4 py-2 border-b border-zinc-100 shrink-0 flex items-center justify-between">
             <span className="text-xs text-zinc-400 font-medium uppercase tracking-wider">
               Scratch pad
             </span>
+            <button
+              onClick={() => setFocusMode((f) => !f)}
+              className={`flex items-center gap-1.5 text-xs px-2 py-1 rounded transition-colors ${
+                focusMode
+                  ? "text-emerald-700 bg-emerald-50 hover:bg-emerald-100"
+                  : "text-zinc-400 hover:text-zinc-600 hover:bg-zinc-100"
+              }`}
+            >
+              {focusMode
+                ? <><Minimize2 className="h-3 w-3" /> Exit focus</>
+                : <><Maximize2 className="h-3 w-3" /> Focus</>
+              }
+            </button>
           </div>
           <div className="flex-1 overflow-auto p-4">
             <CodeEditor
