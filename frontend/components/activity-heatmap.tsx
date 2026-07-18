@@ -15,15 +15,14 @@ function getColor(count: number): string {
 const MONTHS = ["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"];
 
 export function ActivityHeatmap({ data }: ActivityHeatmapProps) {
-  if (!data || data.length === 0) return null;
+  const days = data.length > 0 ? data : generateEmptyDays();
 
-  // Group by week — each week is a column of up to 7 days
-  const firstDate = new Date(data[0].date + "T00:00:00Z");
-  const startOffset = firstDate.getUTCDay(); // 0 = Sun
+  const firstDate = new Date(days[0].date + "T00:00:00Z");
+  const startOffset = firstDate.getUTCDay();
 
   const padded: (DayActivity | null)[] = [
     ...Array(startOffset).fill(null),
-    ...data,
+    ...days,
   ];
 
   const weeks: (DayActivity | null)[][] = [];
@@ -31,7 +30,6 @@ export function ActivityHeatmap({ data }: ActivityHeatmapProps) {
     weeks.push(padded.slice(i, i + 7));
   }
 
-  // Month labels
   const monthLabels: { label: string; weekIndex: number }[] = [];
   let lastMonth = -1;
   weeks.forEach((week, wi) => {
@@ -45,11 +43,9 @@ export function ActivityHeatmap({ data }: ActivityHeatmapProps) {
     });
   });
 
-  const totalSolves = data.reduce((sum, d) => sum + d.count, 0);
-  const activeDays = data.filter((d) => d.count > 0).length;
-
-  // Approximate grid height: 7 rows * (11px + 3px gap) - last gap
-  const gridHeight = 7 * 11 + 6 * 3; // 95px
+  const totalSolves = days.reduce((sum, d) => sum + d.count, 0);
+  const activeDays = days.filter((d) => d.count > 0).length;
+  const gridHeight = 7 * 11 + 6 * 3;
 
   return (
     <div className="mb-6">
@@ -63,12 +59,12 @@ export function ActivityHeatmap({ data }: ActivityHeatmapProps) {
       </div>
 
       <div className="border border-zinc-600 rounded-lg p-4 bg-lime-50 overflow-x-auto">
-        {/* Month labels row */}
-        <div className="flex gap-[3px] mb-1 ml-0">
+        {/* Month labels - full width row */}
+        <div className="flex mb-1" style={{ marginLeft: "14px" }}>
           {weeks.map((_, wi) => {
             const label = monthLabels.find((m) => m.weekIndex === wi);
             return (
-              <div key={wi} className="w-[11px] shrink-0">
+              <div key={wi} className="w-[14px] shrink-0">
                 {label && (
                   <span className="text-[10px] text-zinc-400 whitespace-nowrap">
                     {label.label}
@@ -79,31 +75,42 @@ export function ActivityHeatmap({ data }: ActivityHeatmapProps) {
           })}
         </div>
 
-        {/* Grid row with GIF on the right */}
-        <div className="flex gap-[3px] items-start">
-          {/* Week columns */}
-          {weeks.map((week, wi) => (
-            <div key={wi} className="flex flex-col gap-[3px]">
-              {Array.from({ length: 7 }).map((_, di) => {
-                const day = week[di] ?? null;
-                return (
-                  <div
-                    key={di}
-                    title={
-                      day
-                        ? `${day.date}: ${day.count} solve${day.count !== 1 ? "s" : ""}`
-                        : ""
-                    }
-                    className={`w-[11px] h-[11px] rounded-sm transition-colors ${
-                      day ? getColor(day.count) : "bg-transparent"
-                    }`}
-                  />
-                );
-              })}
-            </div>
-          ))}
+        {/* Grid row */}
+        <div className="flex">
+          {/* Day-of-week labels */}
+          <div className="flex flex-col gap-[3px] mr-[3px]">
+            {["", "Mon", "", "Wed", "", "Fri", ""].map((label, i) => (
+              <div key={i} className="h-[11px] flex items-center text-[10px] text-zinc-400 pr-1">
+                {label}
+              </div>
+            ))}
+          </div>
 
-          {/* GIF – fits vertically inside the heatmap area */}
+          {/* Week columns */}
+          <div className="flex gap-[3px]">
+            {weeks.map((week, wi) => (
+              <div key={wi} className="flex flex-col gap-[3px]">
+                {Array.from({ length: 7 }).map((_, di) => {
+                  const day = week[di] ?? null;
+                  return (
+                    <div
+                      key={di}
+                      title={
+                        day
+                          ? `${day.date}: ${day.count} solve${day.count !== 1 ? "s" : ""}`
+                          : ""
+                      }
+                      className={`w-[11px] h-[11px] rounded-sm transition-colors ${
+                        day ? getColor(day.count) : "bg-transparent"
+                      }`}
+                    />
+                  );
+                })}
+              </div>
+            ))}
+          </div>
+
+          {/* GIF */}
           <div className="ml-4 flex items-center" style={{ height: gridHeight }}>
             <img
               src="../../touphStickT.gif"
@@ -124,4 +131,18 @@ export function ActivityHeatmap({ data }: ActivityHeatmapProps) {
       </div>
     </div>
   );
+}
+
+function generateEmptyDays(): DayActivity[] {
+  const days: DayActivity[] = [];
+  const now = new Date();
+  for (let i = 364; i >= 0; i--) {
+    const d = new Date(now);
+    d.setDate(d.getDate() - i);
+    days.push({
+      date: d.toISOString().slice(0, 10),
+      count: 0,
+    });
+  }
+  return days;
 }

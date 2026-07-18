@@ -46,6 +46,8 @@ const MOCK_KATAS: Kata[] = [
 export default function KatasPage() {
   return (
     <div className="max-w-6xl mx-auto w-full px-6 py-8">
+      <ActivityHeatmap data={[]} />
+
       <div className="flex items-center justify-between mb-6">
         <div>
           <h1 className="text-xl font-semibold text-zinc-900">Katas</h1>
@@ -61,7 +63,6 @@ export default function KatasPage() {
         </Button>
       </div>
 
-      <ActivityHeatmap data={[]} />
       <KatasTable katas={MOCK_KATAS} />
     </div>
   );

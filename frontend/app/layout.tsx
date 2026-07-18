@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import Link from "next/link";
+import { MobileAlert } from "@/components/mobile-alert";
 import "./globals.css";
 
 const geistSans = Geist({
@@ -46,6 +47,7 @@ export default function RootLayout({
             </Link>
           </nav>
         </header>
+        <MobileAlert />
         <main className="flex-1 flex flex-col">{children}</main>
         <footer className="border-t border-zinc-200 px-6 py-3 text-center text-xs text-zinc-400">
           <a href="https://github.com/maabedelhay/kfkd" className="hover:text-zinc-600 transition-colors">
