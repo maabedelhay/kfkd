@@ -2,7 +2,7 @@ main
 .backend.log
 .backend.pid
 .frontend.log
-sqlitekatas.db
+
 *.db
 
 
