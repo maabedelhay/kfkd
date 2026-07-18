@@ -1,10 +1,9 @@
 "use client";
 
-import { useEffect, useState } from "react";
-import { useParams, useRouter } from "next/navigation";
+import { useState } from "react";
+import { useParams } from "next/navigation";
 import Link from "next/link";
 import { ArrowLeft, Calendar, Check, Hash, Maximize2, Minimize2, Save, StickyNote, Timer, Trash2 } from "lucide-react";
-import { kataApi } from "@/lib/api";
 import { Kata } from "@/types/kata";
 import { DifficultyBadge } from "@/components/difficulty-badge";
 import { Badge } from "@/components/ui/badge";
@@ -19,17 +18,26 @@ function formatDate(iso: string) {
   } ${d.getUTCFullYear()}`;
 }
 
+const mockKata: Kata = {
+  id: 1,
+  title: "Sample Kata",
+  content: "// Write a function that returns the nth Fibonacci number.\n// Demo — no backend available.\n\nfunction fibonacci(n) {\n  if (n <= 1) return n;\n  return fibonacci(n - 1) + fibonacci(n - 2);\n}",
+  note: "Try both recursive and iterative approaches.",
+  difficulty: "medium",
+  lines: 8,
+  tags: ["recursion", "math", "demo"],
+  created_at: "2026-06-01T00:00:00Z",
+  last_solved_at: "2026-07-15T00:00:00Z",
+};
+
 export default function KataDetailPage() {
   const params = useParams();
-  const router = useRouter();
-  const id = Number(params.id);
 
-  const [kata, setKata] = useState<Kata | null>(null);
-  const [loading, setLoading] = useState(true);
+  const [kata] = useState<Kata>(mockKata);
   const [error, setError] = useState<string | null>(null);
   const [code, setCode] = useState("");
-  const [content, setContent] = useState("");
-  const [note, setNote] = useState("");
+  const [content, setContent] = useState(mockKata.content);
+  const [note, setNote] = useState(mockKata.note);
   const [deleting, setDeleting] = useState(false);
   const [saveStatus, setSaveStatus] = useState<"idle" | "saving" | "saved" | "error">("idle");
 
@@ -38,81 +46,21 @@ export default function KataDetailPage() {
   const [durationSec, setDurationSec] = useState<number>(0);
   const [solveStatus, setSolveStatus] = useState<"idle" | "solving" | "solved" | "error">("idle");
 
-  useEffect(() => {
-    if (!id) return;
-    kataApi
-      .get(id)
-      .then((data) => {
-        setKata(data);
-        setContent(data.content ?? "");
-        setNote(data.note ?? "");
-      })
-      .catch((e) => {
-        setError(e instanceof Error ? e.message : "Failed to load kata");
-      })
-      .finally(() => setLoading(false));
-  }, [id]);
-
-  async function handleDelete() {
-    if (!kata) return;
-    setDeleting(true);
-    try {
-      await kataApi.delete(kata.id);
-      router.push("/katas");
-    } catch (e) {
-      setError(e instanceof Error ? e.message : "Failed to delete kata");
-      setDeleting(false);
-    }
+  function handleDelete() {
+    setError("Demo — no backend.");
   }
 
-  async function handleSave() {
-    if (!kata) return;
-    setError(null);
-    setSaveStatus("saving");
-    try {
-      await kataApi.save({
-        title: kata.title,
-        content,
-        note,
-        lines: content ? content.split("\n").length : 0,
-        difficulty: kata.difficulty,
-        tags: kata.tags,
-      });
-      setSaveStatus("saved");
-      setTimeout(() => setSaveStatus("idle"), 2000);
-    } catch (e) {
-      setError(e instanceof Error ? e.message : "Failed to save kata");
-      setSaveStatus("error");
-      setTimeout(() => setSaveStatus("idle"), 2000);
-    }
+  function handleSave() {
+    setSaveStatus("saved");
+    setTimeout(() => setSaveStatus("idle"), 2000);
   }
 
-  async function handleSolve() {
-    if (!kata) return;
-    setSolveStatus("solving");
-    try {
-      await kataApi.solve({
-        kata_id: kata.id,
-        duration_sec: durationSec,
-        quality,
-      });
-      setSolveStatus("solved");
-      setTimeout(() => setSolveStatus("idle"), 2000);
-    } catch (e) {
-      setSolveStatus("error");
-      setTimeout(() => setSolveStatus("idle"), 2000);
-    }
+  function handleSolve() {
+    setSolveStatus("solved");
+    setTimeout(() => setSolveStatus("idle"), 2000);
   }
 
-  if (loading) {
-    return (
-      <div className="flex flex-1 items-center justify-center text-sm text-zinc-400">
-        Loading…
-      </div>
-    );
-  }
-
-  if (error || !kata) {
+  if (error && !kata) {
     return (
       <div className="max-w-6xl mx-auto w-full px-6 py-8">
         <Button variant="ghost" size="sm" asChild className="-ml-2 mb-4">

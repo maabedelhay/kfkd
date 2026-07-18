@@ -1,12 +1,8 @@
 "use client";
 
-export const dynamic = "force-dynamic";
-
 import { useState } from "react";
-import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { ArrowLeft, X } from "lucide-react";
-import { kataApi } from "@/lib/api";
 import { Difficulty } from "@/types/kata";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -22,8 +18,6 @@ import {
 import { Badge } from "@/components/ui/badge";
 
 export default function NewKataPage() {
-  const router = useRouter();
-
   const [title, setTitle] = useState("");
   const [content, setContent] = useState("");
   const [note, setNote] = useState("");
@@ -55,32 +49,9 @@ export default function NewKataPage() {
     }
   }
 
-  async function handleSubmit(e: React.FormEvent) {
+  function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
-    setError(null);
-
-    if (!title.trim()) {
-      setError("Title is required.");
-      return;
-    }
-
-    setSubmitting(true);
-    console.log("lines:", content.trim() ? content.trim().split("\n").length : 0);
-    try {
-      await kataApi.save({
-        title: title.trim(),
-        content: content.trim(),
-        lines: content.trim() ? content.trim().split("\n").length : 0,
-        note: note.trim(),
-        difficulty,
-        tags,
-      });
-      router.push("/katas");
-    } catch (e) {
-      setError(e instanceof Error ? e.message : "Failed to save kata");
-    } finally {
-      setSubmitting(false);
-    }
+    setError("Demo — no backend. Kata not saved.");
   }
 
   return (
