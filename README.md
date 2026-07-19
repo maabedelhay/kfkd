@@ -93,9 +93,11 @@ python3 -m http.server -d frontend/out
 ### Deploy to GitHub Pages
  
 ```bash
+git checkout demo
 cd frontend && pnpm build && cd ..
-git add -f frontend/out/
-git commit -m "build"
+git add .
+git commit -m "your message"
+git push origin demo
 git subtree push --prefix frontend/out origin gh-pages
 ```
  
