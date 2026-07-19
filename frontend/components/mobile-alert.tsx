@@ -16,14 +16,13 @@ export function MobileAlert() {
   return (
     <div className="md:hidden fixed inset-0 z-50 flex flex-col items-center justify-center bg-white p-8">
       <div className="text-center max-w-xs">
-        <pre 
-          className="inline-block text-left mb-4 text-zinc-800" 
-          style={{ fontFamily: 'monospace', whiteSpace: 'pre', lineHeight: '1.2' }}>
-      {` /\\_/\\ 
-        ( o.o )
-         > ^ < `}
+  
+        <pre>
+        _____
+        (.---.)-._.-.
+        /:::\ _.---'
+        '-----'    
         </pre>
-
         <h1 className="text-xl font-semibold text-zinc-900 mb-2">Hi mobile user!</h1>
         <p className="text-sm text-zinc-500 leading-relaxed">
           This demo is best viewed on a desktop or tablet in landscape orientation.
